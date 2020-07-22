@@ -1,11 +1,10 @@
-#pragma once
 #include <vector>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <algorithm>
+#include <cmath>
 #include "pedestrian.h"
-
 
 class floorPed {
 	
@@ -30,23 +29,26 @@ class floorPed {
 	std::vector<std::vector<int>> door; //Vector which holds doors (vectors with x and y coordinates)
 	std::vector<double> d_L; //Holds the cell furthest away from every door
 
-	void initializeFloor(int x_, int y_,double kS_, double kD_, double alpha_ , double beta_,  std::vector<std::vector<int>> door_) {
-		
-		x = x_;
-		y = y_;
-		kS = kS_;
-		kD = kD_;
-		alpha = alpha_;
-		beta = beta_;
-		door = door_;
-		
-		startMat();
-		initMat();
-		//buildWall();
+	void initializeFloor(int x_, int y_,
+                             double kS_, double kD_,
+                             double alpha_ , double beta_,
+                             std::vector<std::vector<int>> door_)
+        {
+         x = x_;
+         y = y_;
+         kS = kS_;
+         kD = kD_;
+         alpha = alpha_;
+         beta = beta_;
+         door = door_;
+         
+         startMat();
+         initMat();
+         //buildWall();
 	}
-
-private:
-
+        
+ private:
+        
 	double expFunction(int i, int j);
 	void dynamicDecay();
 	void resetOccupied();
@@ -79,7 +81,12 @@ public:
 	void writeMovements2File(std::string fileName);
 	void writeStatField2File(std::string fileName);
 
-	floorPed(int x_, int y_, double kS_, double kD_, double alpha_, double beta_, std::vector<std::vector<int>> door_) {
-		initializeFloor(x_, y_, kS_, kD_, alpha_, beta_, door_);
-	}
+        // Constructor
+	floorPed(int x_, int y_,
+                 double kS_, double kD_,
+                 double alpha_, double beta_,
+                 std::vector<std::vector<int>> door_)
+         {
+          initializeFloor(x_, y_, kS_, kD_, alpha_, beta_, door_);
+         }
 };

@@ -1,5 +1,3 @@
-
-#include "stdafx.h"
 #include "pedestrian.h"
 /*Initiatializes the probability matrix as a 3x3 matrix of zeros*/
 void pedestrian::initProbMat() {

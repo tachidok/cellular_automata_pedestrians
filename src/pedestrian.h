@@ -1,6 +1,9 @@
-#pragma once
 #include <vector>
 #include <iostream>
+#include <cmath>
+
+#ifndef PEDESTRIAN_H
+#define PEDESTRIAN_H
 
 class pedestrian {
 	
@@ -34,3 +37,5 @@ public:
 	}
 
 };
+
+#endif // #ifndef PEDESTRIAN_H

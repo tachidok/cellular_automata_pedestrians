@@ -1,110 +1,152 @@
-
-#include "stdafx.h"
 #include "floorPed.h"
 
-/*Fills the matrixes with 0 in order to initialize them. 
-Makes indexing easier*/
-void floorPed::startMat() {
-	std::vector<std::vector<double>> temp;
-	for (int i = 0; i < x; i++) {
-		std::vector<double> doubTemp;
-		std::vector<bool> boolTemp;
-		for (int j = 0; j < y; j++) {
-			doubTemp.push_back(0);
-			boolTemp.push_back(0);
-		}
-		dynField.push_back(doubTemp);
-		statField.push_back(doubTemp);
-		occupied.push_back(boolTemp);
-		obstacle.push_back(boolTemp);
-		temp.push_back(doubTemp);
-	}
-
-	for (int k = 0; k < door.size(); k++) {
-		d_L.push_back(0);
-		statFieldVect.push_back(temp);
-	}
+/*Fills the matrices with 0 in order to initialize them. Makes
+indexing easier*/
+void floorPed::startMat()
+{
+ // Initialise matrices
+ dynField.resize(x);
+ statField.resize(x);
+ occupied.resize(x);
+ obstacle.resize(x);
+ 
+ for (unsigned i = 0; i < x; i++)
+  {
+   dynField[i].resize(y);
+   statField[i].resize(y);
+   occupied[i].resize(y);
+   obstacle[i].resize(y);
+  }
+ 
+ // Get the number of doors
+ const unsigned n_doors = door.size();
+ d_L.resize(n_doors, 0);
+ statFieldVect.resize(n_doors);
+ 
+ for (unsigned k = 0; k < n_doors; k++)
+  {
+   statFieldVect[k].resize(x);
+   for (unsigned i = 0; i < x; i++)
+    {
+     statFieldVect[k][i].resize(y);
+    }
+  }
+  
 }
 
-/*Calculates the needed fields, such as the static field
-The first double for loops makes sure all cells are empty before adding walls, doors and pedestrians
-Builds walls around the room and finally,
-adds exits as doors*/
-void floorPed::initMat() {
-	statFieldInit();
-	for (int i = 0; i < x; i++) {
-		for (int j = 0; j < y; j++) {
-			obstacle[i][j] = 1;
-		}
-	}
+/// Calculates the needed fields, such as the static field
 
-	buildWall();
+/// The first double for loops makes sure all cells are empty before
+/// adding walls, doors and pedestrians
 
-	for (int k = 0; k < door.size(); k++) {
-		occupied[door[k][0]][door[k][1]] = 0;
-		obstacle[door[k][0]][door[k][1]] = 1;
-	}
+/// Builds walls around the room and finally, adds exits as doors
+void floorPed::initMat()
+{
+ statFieldInit();
+ 
+ /// There are obstacles everywhere
+ for (int i = 0; i < x; i++)
+  {
+  for (int j = 0; j < y; j++)
+   {
+    obstacle[i][j] = 1;
+   }
+  }
+ 
+ buildWall();
+ 
+ for (int k = 0; k < door.size(); k++)
+  {
+   occupied[door[k][0]][door[k][1]] = 0;
+   obstacle[door[k][0]][door[k][1]] = 1;
+  }
 }
 
 
 /*Calculates the furthest away cell from every door*/
-void floorPed::calcDL() {
-	std::cout << "Entered calcDL" << "\n";
-	std::vector<int> d(door.size());
-	for (int i = 0; i < x; i++) {
-		for (int j = 0 ; j < y; j++) {
-			for(int k = 0; k < door.size(); k++){
-				d[k] = sqrt(((door[k][0]-i)*(door[k][0] - i)) + ((door[k][1]-j)*(door[k][1]-j)));
-				if (d[k] > d_L[k]) {
-				d_L[k] = d[k];
-				}
-			}
-		}
-	}
+void floorPed::calcDL()
+{
+ std::cout << "Entered calcDL" << "\n";
+ std::vector<int> d(door.size());
+ for (int i = 0; i < x; i++)
+  {
+  for (int j = 0 ; j < y; j++)
+   {
+   for(int k = 0; k < door.size(); k++)
+    {
+     d[k] = std::sqrt(((door[k][0]-i)*(door[k][0] - i)) + ((door[k][1]-j)*(door[k][1]-j)));
+     if (d[k] > d_L[k])
+      {
+       d_L[k] = d[k];
+      }
+    }
+   }
+  }
+ 
 }
 
 /*Calculates the value of the static field for every door*/
-void floorPed::calcStatF() {
-	std::cout << "Entered calcStatF" << "\n";
-	for (int i = 0; i < x; i++) {
-		for (int j = 0; j < y; j++) {
-			for (int k = 0; k < door.size(); k++) {
-				statFieldVect[k][i][j] = d_L[k] - sqrt((door[k][0] - i)*(door[k][0] - i) + (door[k][1] - j)*(door[k][1] - j));
-			}
-		}
-	}	
+void floorPed::calcStatF()
+{
+ std::cout << "Entered calcStatF" << "\n";
+ for (int i = 0; i < x; i++)
+  {
+  for (int j = 0; j < y; j++)
+   {
+   for (int k = 0; k < door.size(); k++)
+    {
+     statFieldVect[k][i][j] = d_L[k] - std::sqrt((door[k][0] - i)*(door[k][0] - i) + (door[k][1] - j)*(door[k][1] - j));
+   }
+  }
+ }
+ 
 }
 
 /*Sets and calculates the final static field of the floor*/
-void floorPed::statFieldInit() {
-	std::cout << "Entered statFieldInit" << "\n";
-	calcDL();
-	calcStatF();
-	if (door.size() == 1) {
-		statField = statFieldVect[0];
-	}
-	else {
-		for (int i = 0; i < x; i++) {
-			for (int j = 0; j < y; j++) {
-				for (int k = 0; k < door.size(); k++) {
-					if (statField[i][j] < statFieldVect[k][i][j]) {
-						statField[i][j] = statFieldVect[k][i][j];
-						
-					}
-				}
-			}
-		}
-	}
+void floorPed::statFieldInit()
+{
+ std::cout << "Entered statFieldInit" << "\n";
+ 
+ calcDL();
+ calcStatF();
+ 
+ if (door.size() == 1)
+  {
+   statField = statFieldVect[0];
+  }
+ else
+  {
+   for (int i = 0; i < x; i++)
+    {
+     for (int j = 0; j < y; j++)
+      {
+       for (int k = 0; k < door.size(); k++)
+        {
+         if (statField[i][j] < statFieldVect[k][i][j])
+          {
+           // Get the static field that considers the distance of each
+           // cell to the doors
+           statField[i][j] = statFieldVect[k][i][j];
+          }
+        }
+      }
+    }
+  } // else
+ 
 }
 
 /*Prints the static field DEBUG PURPOSES*/
-void floorPed::printStatField() {
-	for (int i = 0; i < x; i++) {
-		for (int j = 0; j < y; j++) {
-			std::cout << statField[i][j] << ":";
-		}
-		std::cout << "\n";
-	}
+void floorPed::printStatField()
+{
+ for (int i = 0; i < x; i++)
+  {
+  for (int j = 0; j < y; j++)
+   {
+    std::cout << statField[i][j] << ":";
+   }
+  std::cout << "\n";
+  }
+ 
 }
 
 /*Writes the static field of the floor to a text file*/
