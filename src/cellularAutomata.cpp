@@ -34,15 +34,15 @@ int main(int argc, char *argv[])
  // Set seed to 0
  srand(0);
  
- const unsigned n = 1000; //Number of runs
- const unsigned width = 10; //  width of room
- const unsigned height = 10; // height of room
- const unsigned p = 10; //Number of pedestrians in room
+ const unsigned width = 1000; //  width of room
+ const unsigned height = 1000; // height of room
+ const unsigned n = width*height; //Number of runs
+ const unsigned p = 1; //Number of pedestrians in room
  
  // A vector including doors positions
  std::vector<std::vector<int>> doors;
  
- std::vector<int> d1 = { 0,5 };
+ std::vector<int> d1 = { 0,3 };
  std::vector<int> d2 = { 50,99 };
  std::vector<int> d3 = { 0,50 };
  std::vector<int> d4 = { 99,50 };
@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
  const double alpha = 0.7;
  const double beta = 0.8;
  floorPed f1 = floorPed(width, height, kS, kD, alpha, beta, doors);
+ 
  // Add people to the stage
  ranPed(p, f1, width, height);
  
@@ -82,7 +83,12 @@ int main(int argc, char *argv[])
    f1.singleRunDiag();
    std::string fileName = "RESLT/iteration" + std::to_string(it);
    f1.writeMovements2File(fileName);
-   //std::cout << it << "\n";
+   const unsigned print_every = 100;
+   if (it % print_every == 0)
+    {
+     std::cout << "Iteration " << it << " of maximum " << n << std::endl;
+    }
+   
   }
  
  f1.writeMovements2File("RESLT/finalPosition");

@@ -1,6 +1,10 @@
+import os
+import sys
+import argparse
 import matplotlib.pyplot as plt
 
 def graph_field(file_name):
+    
     infile = open(file_name+".txt", 'r')
     matrix = []
     temp = []
@@ -16,9 +20,24 @@ def graph_field(file_name):
     plt.show()
     
 def main():
-    graph_field("staticField")
-    graph_field("initialPosition")
-    graph_field("finalPosition")
+    
+    # Create the parser to deal with the arguments
+    parser = argparse.ArgumentParser("Plot room states")
+    
+    # Set the positional arguments
+    parser.add_argument('--RESLT_PATH', dest='RESLT_PATH', type=str, required=True, help='The path with the results')
+    
+    # parse args
+    args = parser.parse_args()
+    
+    # RESLT folder
+    RESLT = args.RESLT_PATH
+
+    print(f"Path to folder: {RESLT}")
+    
+    graph_field(RESLT + "staticField")
+    graph_field(RESLT + "initialPosition")
+    graph_field(RESLT + "finalPosition")
 
 if __name__ == '__main__':
     main()

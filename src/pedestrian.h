@@ -11,7 +11,7 @@ class pedestrian {
 
 	//class variables
 	std::vector<int> position; //Will hold two elements only, x and y
-	std::vector<std::vector<double>> probMat; //3x3 matrix that show the probability of the pedestrian to move to each cell
+	std::vector<std::vector<double> > probMat; //3x3 matrix that show the probability of the pedestrian to move to each cell
 	std::vector<int> desiredMove; //Hold the chosen cell the pedestrian wants to move to. Will be used to detect and deal with conflicts
 	double probMax; //Holds the probability of the choosen cell the pedestrian wants to move to
 	bool escape;//0 if not at the door, 1 when at the door
